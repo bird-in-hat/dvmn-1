@@ -13,11 +13,14 @@ def draw(canvas):
     coroutines = []
 
     # Stars
-    for i in range(100):
+    for i in range(50):
         coroutines.append(get_star_coroutine(canvas))
 
     o_r = curses.LINES // 2
     o_c = curses.COLS // 2
+
+    # o_r = 1
+    # o_c = 5
 
     # Fire
     # coroutines.append(fire(canvas, curses.LINES-1, curses.COLS//2, columns_speed=-0.3))
