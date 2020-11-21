@@ -2,11 +2,10 @@ import asyncio
 import curses_tools
 
 
-HEIGHT = 9
-WIDTH = 3
-
 frame_1 = None
 frame_2 = None
+
+ship_speed = 4
 
 
 def load_frames():
@@ -23,9 +22,18 @@ def check_move(canvas, row, column):
 
     rows_direction, columns_direction, space_pressed = curses_tools.read_controls(canvas)
 
-    if 0 < row < max_row and 0 < column < max_column:
-        row += rows_direction
-        column += columns_direction
+    ship_height, ship_width = curses_tools.get_frame_size(frame_1)
+
+    if rows_direction < 0:
+        row = max(1, row + rows_direction * ship_speed)
+    if rows_direction > 0:
+        row = min(row + rows_direction * ship_speed, max_row - ship_height)
+
+    if columns_direction < 0:
+        column = max(1, column + columns_direction * ship_speed)
+    if columns_direction > 0:
+        column = min(column + columns_direction * ship_speed, max_column - ship_width)
+
     return row, column, space_pressed
 
 
