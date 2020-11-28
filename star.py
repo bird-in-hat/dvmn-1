@@ -2,22 +2,32 @@ import time
 import curses
 import asyncio
 import random
-from curses_tools import sleep
+import settings
+
+
+async def sleep(sleep_time):
+    frames_count = int(sleep_time / settings.TIC_RATE)
+    for i in range(frames_count):
+        await asyncio.sleep(0)
+
+
+async def sleep_random(sleep_time): 
+    await sleep(sleep_time + random.random())
 
 
 async def blink(canvas, row, column, symbol='*'):
     while True:
         canvas.addstr(row, column, symbol, curses.A_DIM)
-        await sleep(2)
+        await sleep_random(2)
 
         canvas.addstr(row, column, symbol)
-        await sleep(0.3)
+        await sleep_random(0.3)
 
         canvas.addstr(row, column, symbol, curses.A_BOLD)
-        await sleep(0.5)
+        await sleep_random(0.5)
 
         canvas.addstr(row, column, symbol)
-        await sleep(0.3)
+        await sleep_random(0.3)
 
 
 def get_star_coroutine(canvas):

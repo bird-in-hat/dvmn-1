@@ -3,6 +3,8 @@ import curses
 from fire import fire
 from star import get_star_coroutine
 from spaceship import animate_spaceship
+from curses_tools import get_file_content
+import settings
 
 
 def draw(canvas):
@@ -10,28 +12,33 @@ def draw(canvas):
     curses.curs_set(False)
     canvas.nodelay(True)
 
-    coroutines = []
-
     # Stars
-    for i in range(50):
-        coroutines.append(get_star_coroutine(canvas))
+    star_coroutines = [get_star_coroutine(canvas) for i in range(50)]
 
-    o_r = curses.LINES // 2
-    o_c = curses.COLS // 2
+    lines_center = curses.LINES // 2
+    cols_center = curses.COLS // 2
 
+    animation_coroutines = []
     # Fire
-    # coroutines.append(fire(canvas, curses.LINES-1, curses.COLS//2, columns_speed=-0.3))
+    # animation_coroutine.append(fire(canvas, curses.LINES-1, curses.COLS//2, columns_speed=-0.3))
 
     # Spaceship
-    coroutines.append(animate_spaceship(canvas, o_r, o_c))
+    ship_frames = (get_file_content("animation/rocket_frame_{}.txt".format(i)) for i in [1, 2])
+    ship_coroutine = animate_spaceship(canvas, lines_center, cols_center, ship_frames)
 
-    while coroutines:
-        for c in coroutines.copy():
+    while True:
+        ship_coroutine.send(None)
+
+        for sc in star_coroutines:
+            sc.send(None)
+
+        for ac in animation_coroutines.copy():
             try:
-                c.send(None)
+                ac.send(None)
             except StopIteration:
-                coroutines.remove(c)
-        time.sleep(0.1)
+                animation_coroutines.remove(ac)
+
+        time.sleep(settings.TIC_RATE)
         canvas.refresh()
 
 

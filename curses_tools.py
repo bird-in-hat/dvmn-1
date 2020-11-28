@@ -8,11 +8,6 @@ UP_KEY_CODE = 259
 DOWN_KEY_CODE = 258
 
 
-async def sleep(count):
-    for i in range(int((count + random.random()) * 10)):
-        await asyncio.sleep(0)
-
-
 def read_controls(canvas):
     """Read keys pressed and returns tuple witl controls state."""
     
@@ -83,3 +78,9 @@ def get_frame_size(text):
     rows = len(lines)
     columns = max([len(line) for line in lines])
     return rows, columns
+
+
+def get_file_content(filename):
+    with open(filename, "r") as f:
+        content = f.read()
+    return content
