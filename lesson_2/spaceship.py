@@ -2,6 +2,12 @@ import asyncio
 import curses_tools
 import settings
 import itertools
+import os
+
+
+def get_frames():
+    curr_path = os.path.dirname(os.path.abspath(__file__))
+    return [curses_tools.get_file_content(curr_path + "/frames/ship/rocket_frame_{}.txt".format(i)) for i in [1, 2]]
 
 
 def get_ship_coordinates(canvas, row, column, frame):
