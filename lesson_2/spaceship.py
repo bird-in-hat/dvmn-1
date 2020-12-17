@@ -33,8 +33,7 @@ def get_ship_coordinates(canvas, row, column, frame):
 
 async def animate_spaceship(canvas, row, column, frames):
     for frame in itertools.cycle(frames):
+        row, column, space_pressed = get_ship_coordinates(canvas, row, column, frame)
         curses_tools.draw_frame(canvas, row, column, frame)
-        row_move_to, column_move_to, space_pressed = get_ship_coordinates(canvas, row, column, frame)
         await asyncio.sleep(0)
         curses_tools.draw_frame(canvas, row, column, frame, negative=True)
-        row, column = row_move_to, column_move_to

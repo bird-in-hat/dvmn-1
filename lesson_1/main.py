@@ -40,8 +40,8 @@ def draw(canvas):
             except StopIteration:
                 animation_coroutines.remove(ac)
 
-        time.sleep(settings.TIC_RATE)
         canvas.refresh()
+        time.sleep(settings.TIC_RATE)
 
 
 if __name__ == '__main__':
