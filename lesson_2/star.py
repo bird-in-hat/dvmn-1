@@ -3,16 +3,7 @@ import curses
 import asyncio
 import random
 import settings
-
-
-async def sleep(sleep_time):
-    frames_count = int(sleep_time / settings.TIC_RATE)
-    for i in range(frames_count):
-        await asyncio.sleep(0)
-
-
-async def sleep_random(sleep_time): 
-    await sleep(sleep_time + random.random())
+from curses_tools import sleep_random
 
 
 async def blink(canvas, row, column, symbol='*'):

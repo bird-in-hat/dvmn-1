@@ -1,5 +1,6 @@
 import random
 import asyncio
+import settings
 
 SPACE_KEY_CODE = 32
 LEFT_KEY_CODE = 260
@@ -84,3 +85,13 @@ def get_file_content(filename):
     with open(filename, "r") as f:
         content = f.read()
     return content
+
+
+async def sleep(tics=1):
+    frames_count = int(tics / settings.TIC_RATE)
+    for i in range(frames_count):
+        await asyncio.sleep(0)
+
+
+async def sleep_random(tics=1): 
+    await sleep(tics + random.random())

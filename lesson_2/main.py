@@ -30,7 +30,7 @@ def draw(canvas):
 
     # Garbage
     garbage_frames = space_garbage.get_frames()
-    garbage_coroutines = [space_garbage.get_random_garbage(canvas, garbage_frames) for i in range(10)]
+    garbage_coroutine = space_garbage.fill_orbit_with_garbage(canvas, garbage_frames, 10)
 
     while True:
         ship_coroutine.send(None)
@@ -44,14 +44,10 @@ def draw(canvas):
             except StopIteration:
                 animation_coroutines.remove(ac)
 
-        for gc in garbage_coroutines.copy():
-            try:
-                gc.send(None)
-            except StopIteration:
-                garbage_coroutines.remove(gc)
+        # garbage_coroutine.send(None)
 
-        time.sleep(settings.TIC_RATE)
         canvas.refresh()
+        time.sleep(settings.TIC_RATE)
 
 
 if __name__ == '__main__':
