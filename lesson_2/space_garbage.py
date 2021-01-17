@@ -5,12 +5,20 @@ import random
 
 
 class Obstacle:
-    def __init__(self, coroutine, column, frame, speed=0.5):
-        self.coroutine = coroutine
-        self.column = column
+    def __init__(self, frame, column, row, height, width, speed=0.5):
         self.frame = frame
+        self.column = column
+        self.row = row
+        self.height = height
+        self.width = width
         self.speed = speed
-        self.row = None
+
+    def get_bounding_frame(self):
+        frame = ' ' + '-' * (self.width - 1) + ' \n'
+        for _ in range(self.height - 2):
+            frame += '|' + ' ' * (self.width - 1) + '|\n'
+        frame += ' ' + '-' * (self.width -1) + ' \n'
+        return frame
 
 
 obstacles = []
@@ -27,40 +35,47 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
 
     column = max(column, 0)
     column = min(column, columns_number)
-
     row = 1
+    height, width = curses_tools.get_frame_size(garbage_frame)
+    obstacle = Obstacle(garbage_frame, column, row, height=height, width=width, speed=speed)
+    bounding_frame = obstacle.get_bounding_frame()
+
+    global obstacles
+    obstacles.append(obstacle)
 
     while row < rows_number:
+        curses_tools.draw_frame(canvas, row, column, bounding_frame)
         curses_tools.draw_frame(canvas, row, column, garbage_frame)
         await asyncio.sleep(0)
         curses_tools.draw_frame(canvas, row, column, garbage_frame, negative=True)
+        curses_tools.draw_frame(canvas, row, column, bounding_frame, negative=True)
         row += speed
+        obstacle.row = row
 
 
 def get_random_garbage(canvas, frames):
-    """Returns Obstacle 
+    """Returns coroutine
     """
     rows_number, columns_number = canvas.getmaxyx()
-    column = random.randrange(1, columns_number)
     frame = random.choice(frames)
+    column = random.randrange(0, columns_number)
     speed = random.choice([0.3, 0.4, 0.5, 0.6])
-    coroutine = fly_garbage(canvas, column, frame, speed)
-    return Obstacle(coroutine, column, frame, speed)
+    return fly_garbage(canvas, column, frame, speed)
 
 
 async def fill_orbit_with_garbage(canvas, frames, obsctacles_count=10):
-    global obstacles
+    coroutines = []
 
     for i in range(obsctacles_count // 3):
-        obstacles.append(get_random_garbage(canvas, frames))
+        coroutines.append(get_random_garbage(canvas, frames))
 
     while True:
-        if len(obstacles) < obsctacles_count and random.random() < 0.13:
-            obstacles.append(get_random_garbage(canvas, frames))
+        if len(coroutines) < obsctacles_count and random.random() < 0.13:
+            coroutines.append(get_random_garbage(canvas, frames))
 
-        for o in obstacles.copy():
+        for o in coroutines.copy():
             try:
-                o.coroutine.send(None)
+                o.send(None)
             except StopIteration:
-                obstacles.remove(o)
+                coroutines.remove(o)
         await asyncio.sleep(0)
