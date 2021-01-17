@@ -7,6 +7,7 @@ from obstacles import Obstacle
 
 
 obstacles = []
+obstacles_in_last_collisions = []
 
 
 def get_frames():
@@ -28,13 +29,20 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
     global obstacles
     obstacles.append(obstacle)
 
+    global obstacles_in_last_collisions
+
     while obstacle.row < rows_number:
-        curses_tools.draw_frame(canvas, obstacle.row - 1, bounding_column, bounding_frame)
+        # curses_tools.draw_frame(canvas, obstacle.row - 1, bounding_column, bounding_frame)
         curses_tools.draw_frame(canvas, obstacle.row, column, garbage_frame)
         await asyncio.sleep(0)
         curses_tools.draw_frame(canvas, obstacle.row, column, garbage_frame, negative=True)
-        curses_tools.draw_frame(canvas, obstacle.row - 1, bounding_column, bounding_frame, negative=True)
+        # curses_tools.draw_frame(canvas, obstacle.row - 1, bounding_column, bounding_frame, negative=True)
         obstacle.row += speed
+
+        if obstacle in obstacles_in_last_collisions:
+            obstacles_in_last_collisions.remove(obstacle)
+            obstacles.remove(obstacle)
+            return
 
 
 def get_random_garbage(canvas, frames):

@@ -1,5 +1,6 @@
 import curses
 import asyncio
+import space_garbage
 
 
 async def fire(canvas, start_row, start_column, rows_speed=-0.5, columns_speed=0):
@@ -30,3 +31,7 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.5, columns_speed=0
         canvas.addstr(round(row), round(column), ' ')
         row += rows_speed
         column += columns_speed
+        for obstacle in space_garbage.obstacles:
+            if obstacle.has_collision(row, column):
+                space_garbage.obstacles_in_last_collisions.append(obstacle)
+                return
