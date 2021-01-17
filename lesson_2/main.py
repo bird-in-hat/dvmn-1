@@ -21,8 +21,8 @@ def draw(canvas):
     cols_center = curses.COLS // 2
 
     animation_coroutines = []
-    # Fire
-    # animation_coroutine.append(fire(canvas, curses.LINES-1, curses.COLS//2, columns_speed=-0.3))
+    # Initial Fire
+    # animation_coroutine.append()
 
     # Spaceship
     ship_frames = spaceship.get_frames()
@@ -44,7 +44,7 @@ def draw(canvas):
             except StopIteration:
                 animation_coroutines.remove(ac)
 
-        # garbage_coroutine.send(None)
+        garbage_coroutine.send(None)
 
         canvas.refresh()
         time.sleep(settings.TIC_RATE)

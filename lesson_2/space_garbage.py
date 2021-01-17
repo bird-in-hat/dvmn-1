@@ -10,6 +10,7 @@ class Obstacle:
         self.column = column
         self.frame = frame
         self.speed = speed
+        self.row = None
 
 
 obstacles = []
@@ -25,7 +26,7 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
     rows_number, columns_number = canvas.getmaxyx()
 
     column = max(column, 0)
-    column = min(column, columns_number - 1)
+    column = min(column, columns_number)
 
     row = 1
 
@@ -43,24 +44,23 @@ def get_random_garbage(canvas, frames):
     column = random.randrange(1, columns_number)
     frame = random.choice(frames)
     speed = random.choice([0.3, 0.4, 0.5, 0.6])
-    coro = fly_garbage(canvas, column, frame, speed)
-    return Obstacle(coro, column, frame, speed)
+    coroutine = fly_garbage(canvas, column, frame, speed)
+    return Obstacle(coroutine, column, frame, speed)
 
 
 async def fill_orbit_with_garbage(canvas, frames, obsctacles_count=10):
     global obstacles
 
-    for i in range(obsctacles_count // 2):
+    for i in range(obsctacles_count // 3):
         obstacles.append(get_random_garbage(canvas, frames))
 
     while True:
-        if len(obstacles) < obsctacles_count and random.random() < 0.1:
+        if len(obstacles) < obsctacles_count and random.random() < 0.13:
             obstacles.append(get_random_garbage(canvas, frames))
+
         for o in obstacles.copy():
             try:
                 o.coroutine.send(None)
             except StopIteration:
                 obstacles.remove(o)
-                # # Replace excluded with new
-                obstacles.append(get_random_garbage(canvas, frames))
         await asyncio.sleep(0)

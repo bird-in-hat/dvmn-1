@@ -49,7 +49,7 @@ def draw_frame(canvas, start_row, start_column, text, negative=False):
         if row < 0:
             continue
 
-        if row >= rows_number:
+        if row >= rows_number - 1:
             break
 
         for column, symbol in enumerate(line, round(start_column)):

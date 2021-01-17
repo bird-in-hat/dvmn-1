@@ -4,6 +4,7 @@ import settings
 import itertools
 import os
 from physics import update_speed
+from fire import fire
 
 
 row_speed = 0
@@ -28,22 +29,31 @@ def get_ship_coordinates(canvas, row, column, frame):
     row_speed, column_speed = update_speed(row_speed, column_speed, rows_direction, columns_direction)
     row, column = row + int(row_speed * settings.SHIP_ROW_SPEED), column + int(column_speed * settings.SHIP_COL_SPEED)
 
-    if row < 1:
-        row = 1
-    if row > max_row - ship_height:
-        row = max_row - ship_height
+    row = max(1, row)
+    row = min(row, max_row - ship_height)
 
-    if column < 1:
-        column = 1
-    if column > max_column - ship_width:
-        column = max_column - ship_width
+    column = max(1, column)
+    column = min(column, max_column - ship_width)
 
     return row, column, space_pressed
 
 
+def animate_fire(canvas, shots):
+    for s in shots.copy():
+        try:
+            s.send(None)
+        except StopIteration:
+            shots.remove(s)
+    return shots
+
+
 async def animate_spaceship(canvas, row, column, frames):
+    shots = []
     for frame in itertools.cycle(frames):
         row, column, space_pressed = get_ship_coordinates(canvas, row, column, frame)
+        if space_pressed:
+            shots.append(fire(canvas, row, column + 2, rows_speed=-0.5))
+        shots = animate_fire(canvas, shots)
         curses_tools.draw_frame(canvas, row, column, frame)
         await asyncio.sleep(0)
         curses_tools.draw_frame(canvas, row, column, frame, negative=True)
