@@ -2,23 +2,8 @@ import curses_tools
 import asyncio
 import os
 import random
+from obstacles import Obstacle
 
-
-class Obstacle:
-    def __init__(self, frame, column, row, height, width, speed=0.5):
-        self.frame = frame
-        self.column = column
-        self.row = row
-        self.height = height
-        self.width = width
-        self.speed = speed
-
-    def get_bounding_frame(self):
-        frame = ' ' + '-' * (self.width - 1) + ' \n'
-        for _ in range(self.height - 2):
-            frame += '|' + ' ' * (self.width - 1) + '|\n'
-        frame += ' ' + '-' * (self.width -1) + ' \n'
-        return frame
 
 
 obstacles = []
@@ -37,20 +22,19 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
     column = min(column, columns_number)
     row = 1
     height, width = curses_tools.get_frame_size(garbage_frame)
-    obstacle = Obstacle(garbage_frame, column, row, height=height, width=width, speed=speed)
-    bounding_frame = obstacle.get_bounding_frame()
+    obstacle = Obstacle(row, column, rows_size=height, columns_size=width)
+    _, bounding_column, bounding_frame = obstacle.dump_bounding_box()
 
     global obstacles
     obstacles.append(obstacle)
 
-    while row < rows_number:
-        curses_tools.draw_frame(canvas, row, column, bounding_frame)
-        curses_tools.draw_frame(canvas, row, column, garbage_frame)
+    while obstacle.row < rows_number:
+        curses_tools.draw_frame(canvas, obstacle.row - 1, bounding_column, bounding_frame)
+        curses_tools.draw_frame(canvas, obstacle.row, column, garbage_frame)
         await asyncio.sleep(0)
-        curses_tools.draw_frame(canvas, row, column, garbage_frame, negative=True)
-        curses_tools.draw_frame(canvas, row, column, bounding_frame, negative=True)
-        row += speed
-        obstacle.row = row
+        curses_tools.draw_frame(canvas, obstacle.row, column, garbage_frame, negative=True)
+        curses_tools.draw_frame(canvas, obstacle.row - 1, bounding_column, bounding_frame, negative=True)
+        obstacle.row += speed
 
 
 def get_random_garbage(canvas, frames):
