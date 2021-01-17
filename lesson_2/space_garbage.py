@@ -3,9 +3,10 @@ import asyncio
 import os
 import random
 from obstacles import Obstacle
+from explosion import explode
 
 
-
+coroutines = []
 obstacles = []
 obstacles_in_last_collisions = []
 
@@ -42,6 +43,9 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
         if obstacle in obstacles_in_last_collisions:
             obstacles_in_last_collisions.remove(obstacle)
             obstacles.remove(obstacle)
+
+            coroutines.append(explode(canvas, obstacle.row + height // 2, column + width // 2))
+
             return
 
 
@@ -56,7 +60,7 @@ def get_random_garbage(canvas, frames):
 
 
 async def fill_orbit_with_garbage(canvas, frames, obsctacles_count=10):
-    coroutines = []
+    global coroutines
 
     for i in range(obsctacles_count // 3):
         coroutines.append(get_random_garbage(canvas, frames))

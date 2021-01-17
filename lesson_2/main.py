@@ -7,6 +7,7 @@ import space_garbage
 from curses_tools import get_file_content
 import settings
 import os 
+from game_over import game_over_draw
 
 
 def draw(canvas):
@@ -33,7 +34,13 @@ def draw(canvas):
     garbage_coroutine = space_garbage.fill_orbit_with_garbage(canvas, garbage_frames, 10)
 
     while True:
-        ship_coroutine.send(None)
+        try:
+            ship_coroutine.send(None)
+        except spaceship.GameOverException:
+            canvas.clear()
+            game_over_draw(canvas)
+            canvas.refresh()
+            break
 
         for sc in star_coroutines:
             sc.send(None)
@@ -48,6 +55,8 @@ def draw(canvas):
 
         canvas.refresh()
         time.sleep(settings.TIC_RATE)
+
+    time.sleep(20)
 
 
 if __name__ == '__main__':

@@ -3,12 +3,17 @@ import curses_tools
 import settings
 import itertools
 import os
+import space_garbage
 from physics import update_speed
 from fire import fire
 
 
 row_speed = 0
 column_speed = 0
+
+
+class GameOverException(Exception):
+    pass
 
 
 def get_frames():
@@ -49,11 +54,17 @@ def animate_fire(canvas, shots):
 
 async def animate_spaceship(canvas, row, column, frames):
     shots = []
+    height, width = curses_tools.get_frame_size(frames[0])
     for frame in itertools.cycle(frames):
         row, column, space_pressed = get_ship_coordinates(canvas, row, column, frame)
+        curses_tools.draw_frame(canvas, row, column, frame)
         if space_pressed:
             shots.append(fire(canvas, row, column + 2, rows_speed=-0.5))
         shots = animate_fire(canvas, shots)
-        curses_tools.draw_frame(canvas, row, column, frame)
         await asyncio.sleep(0)
         curses_tools.draw_frame(canvas, row, column, frame, negative=True)
+
+        for obstacle in space_garbage.obstacles:
+            if obstacle.has_collision(row, column, obj_size_rows=height, obj_size_columns=width):
+                space_garbage.obstacles_in_last_collisions.append(obstacle)
+                raise GameOverException()
