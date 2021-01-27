@@ -4,11 +4,7 @@ import os
 import random
 from obstacles import Obstacle
 from explosion import explode
-
-
-coroutines = []
-obstacles = []
-obstacles_in_last_collisions = []
+import state
 
 
 def get_frames():
@@ -27,10 +23,7 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
     obstacle = Obstacle(row, column, rows_size=height, columns_size=width)
     _, bounding_column, bounding_frame = obstacle.dump_bounding_box()
 
-    global obstacles
-    obstacles.append(obstacle)
-
-    global obstacles_in_last_collisions
+    state.obstacles.append(obstacle)
 
     while obstacle.row < rows_number:
         # curses_tools.draw_frame(canvas, obstacle.row - 1, bounding_column, bounding_frame)
@@ -40,11 +33,11 @@ async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
         # curses_tools.draw_frame(canvas, obstacle.row - 1, bounding_column, bounding_frame, negative=True)
         obstacle.row += speed
 
-        if obstacle in obstacles_in_last_collisions:
-            obstacles_in_last_collisions.remove(obstacle)
-            obstacles.remove(obstacle)
+        if obstacle in state.obstacles_in_last_collisions.copy():
+            state.obstacles_in_last_collisions.remove(obstacle)
+            state.obstacles.remove(obstacle)
 
-            coroutines.append(explode(canvas, obstacle.row + height // 2, column + width // 2))
+            state.coroutines.append(explode(canvas, obstacle.row + height // 2, column + width // 2))
 
             return
 
@@ -60,18 +53,16 @@ def get_random_garbage(canvas, frames):
 
 
 async def fill_orbit_with_garbage(canvas, frames, obsctacles_count=10):
-    global coroutines
-
     for i in range(obsctacles_count // 3):
-        coroutines.append(get_random_garbage(canvas, frames))
+        state.coroutines.append(get_random_garbage(canvas, frames))
 
     while True:
-        if len(coroutines) < obsctacles_count and random.random() < 0.13:
-            coroutines.append(get_random_garbage(canvas, frames))
+        if len(state.coroutines) < obsctacles_count and random.random() < 0.13:
+            state.coroutines.append(get_random_garbage(canvas, frames))
 
-        for o in coroutines.copy():
+        for o in state.coroutines.copy():
             try:
                 o.send(None)
             except StopIteration:
-                coroutines.remove(o)
+                state.coroutines.remove(o)
         await asyncio.sleep(0)

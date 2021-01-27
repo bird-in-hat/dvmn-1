@@ -3,7 +3,7 @@ import curses_tools
 import settings
 import itertools
 import os
-import space_garbage
+import state
 from physics import update_speed
 from fire import fire
 
@@ -64,7 +64,7 @@ async def animate_spaceship(canvas, row, column, frames):
         await asyncio.sleep(0)
         curses_tools.draw_frame(canvas, row, column, frame, negative=True)
 
-        for obstacle in space_garbage.obstacles:
+        for obstacle in state.obstacles:
             if obstacle.has_collision(row, column, obj_size_rows=height, obj_size_columns=width):
-                space_garbage.obstacles_in_last_collisions.append(obstacle)
+                state.obstacles_in_last_collisions.append(obstacle)
                 raise GameOverException()

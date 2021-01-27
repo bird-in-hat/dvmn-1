@@ -1,6 +1,8 @@
 import random
 import asyncio
 import settings
+import state
+
 
 SPACE_KEY_CODE = 32
 LEFT_KEY_CODE = 260
@@ -95,3 +97,19 @@ async def sleep(tics=1):
 
 async def sleep_random(tics=1): 
     await sleep(tics + random.random())
+
+
+async def update_state():
+    """Increment current year"""
+    while True:
+        await sleep(1.5)
+        state.year += 1
+
+
+async def show_year(canvas):
+    """Show current year on left bottom of canvas."""
+    rows_number, _ = canvas.getmaxyx()
+
+    while True:
+        draw_frame(canvas, rows_number - 2, 0, f"Year: {str(state.year)}")
+        await asyncio.sleep(0)

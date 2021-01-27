@@ -4,7 +4,7 @@ from fire import fire
 from star import get_star_coroutine
 import spaceship
 import space_garbage
-from curses_tools import get_file_content
+from curses_tools import get_file_content, update_state, show_year
 import settings
 import os 
 from game_over import game_over_draw
@@ -20,6 +20,9 @@ def draw(canvas):
 
     lines_center = curses.LINES // 2
     cols_center = curses.COLS // 2
+
+    update_state_coroutine = update_state()
+    show_year_coroutine = show_year(canvas)
 
     animation_coroutines = []
     # Initial Fire
@@ -52,6 +55,8 @@ def draw(canvas):
                 animation_coroutines.remove(ac)
 
         garbage_coroutine.send(None)
+        update_state_coroutine.send(None)
+        show_year_coroutine.send(None)
 
         canvas.refresh()
         time.sleep(settings.TIC_RATE)
