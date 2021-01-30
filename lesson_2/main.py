@@ -34,7 +34,7 @@ def draw(canvas):
 
     # Garbage
     garbage_frames = space_garbage.get_frames()
-    garbage_coroutine = space_garbage.fill_orbit_with_garbage(canvas, garbage_frames, 10)
+    garbage_coroutine = space_garbage.fill_orbit_with_garbage(canvas, garbage_frames)
 
     while True:
         try:

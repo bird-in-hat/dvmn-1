@@ -5,6 +5,7 @@ import random
 from obstacles import Obstacle
 from explosion import explode
 import state
+from game_scenario import get_garbage_delay_tics
 
 
 def get_frames():
@@ -52,12 +53,14 @@ def get_random_garbage(canvas, frames):
     return fly_garbage(canvas, column, frame, speed)
 
 
-async def fill_orbit_with_garbage(canvas, frames, obsctacles_count=10):
-    for i in range(obsctacles_count // 3):
-        state.coroutines.append(get_random_garbage(canvas, frames))
+async def fill_orbit_with_garbage(canvas, frames):
+    state.coroutines.append(get_random_garbage(canvas, frames))
 
+    tics = 0
     while True:
-        if len(state.coroutines) < obsctacles_count and random.random() < 0.13:
+        tics_delay = get_garbage_delay_tics(state.year) 
+        if tics_delay and tics_delay <= tics:
+            tics = 0
             state.coroutines.append(get_random_garbage(canvas, frames))
 
         for o in state.coroutines.copy():
@@ -65,4 +68,5 @@ async def fill_orbit_with_garbage(canvas, frames, obsctacles_count=10):
                 o.send(None)
             except StopIteration:
                 state.coroutines.remove(o)
+        tics += 1
         await asyncio.sleep(0)
