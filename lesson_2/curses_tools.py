@@ -59,9 +59,9 @@ def draw_frame(canvas, start_row, start_column, text, negative=False):
             if column < 0:
                 continue
 
-            if column >= columns_number:
+            if column >= columns_number -1 or column < 1:
                 break
-                
+
             if symbol == ' ':
                 continue
 
@@ -117,6 +117,5 @@ async def show_year_info(canvas):
             draw_frame(canvas, rows_number - 2, 20, phrase_of_year)
         else:
             draw_frame(canvas, rows_number - 2, 20, '*' * 50, negative=True)
-        draw_frame(canvas.derwin(0, 1), rows_number - 2, 0, f"Year: {str(state.year)}")
+        draw_frame(canvas.derwin(0, 1), rows_number - 2, 1, f"Year: {str(state.year)}")
         await asyncio.sleep(0)
-    

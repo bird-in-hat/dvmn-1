@@ -35,7 +35,7 @@ def get_ship_coordinates(canvas, row, column, frame):
     row, column = row + int(row_speed * settings.SHIP_ROW_SPEED), column + int(column_speed * settings.SHIP_COL_SPEED)
 
     row = max(1, row)
-    row = min(row, max_row - ship_height)
+    row = min(row, max_row - ship_height - 1)
 
     column = max(1, column)
     column = min(column, max_column - ship_width)
