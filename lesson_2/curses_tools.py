@@ -2,6 +2,7 @@ import random
 import asyncio
 import settings
 import state
+import game_scenario
 
 
 SPACE_KEY_CODE = 32
@@ -100,16 +101,22 @@ async def sleep_random(tics=1):
 
 
 async def update_state():
-    """Increment current year"""
+    """Increment current year and enables shotgun after 2020"""
     while True:
         await sleep(1.5)
         state.year += 1
+        if state.year >= 2020 and not state.shotgun_enabled:
+            state.shotgun_enabled = True
 
 
-async def show_year(canvas):
+async def show_year_info(canvas):
     """Show current year on left bottom of canvas."""
     rows_number, _ = canvas.getmaxyx()
-
     while True:
-        draw_frame(canvas, rows_number - 2, 0, f"Year: {str(state.year)}")
+        if phrase_of_year := game_scenario.PHRASES.get(state.year):
+            draw_frame(canvas, rows_number - 2, 20, phrase_of_year)
+        else:
+            draw_frame(canvas, rows_number - 2, 20, '*' * 50, negative=True)
+        draw_frame(canvas.derwin(0, 1), rows_number - 2, 0, f"Year: {str(state.year)}")
         await asyncio.sleep(0)
+    

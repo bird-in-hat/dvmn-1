@@ -58,7 +58,7 @@ async def animate_spaceship(canvas, row, column, frames):
     for frame in itertools.cycle(frames):
         row, column, space_pressed = get_ship_coordinates(canvas, row, column, frame)
         curses_tools.draw_frame(canvas, row, column, frame)
-        if space_pressed:
+        if space_pressed and state.shotgun_enabled:
             shots.append(fire(canvas, row, column + 2, rows_speed=-0.5))
         shots = animate_fire(canvas, shots)
         await asyncio.sleep(0)

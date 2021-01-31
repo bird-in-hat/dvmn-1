@@ -4,7 +4,7 @@ from fire import fire
 from star import get_star_coroutine
 import spaceship
 import space_garbage
-from curses_tools import get_file_content, update_state, show_year
+from curses_tools import get_file_content, update_state, show_year_info
 import settings
 import os 
 from game_over import game_over_draw
@@ -22,11 +22,7 @@ def draw(canvas):
     cols_center = curses.COLS // 2
 
     update_state_coroutine = update_state()
-    show_year_coroutine = show_year(canvas)
-
-    animation_coroutines = []
-    # Initial Fire
-    # animation_coroutine.append()
+    show_year_coroutine = show_year_info(canvas)
 
     # Spaceship
     ship_frames = spaceship.get_frames()
@@ -47,12 +43,6 @@ def draw(canvas):
 
         for sc in star_coroutines:
             sc.send(None)
-
-        for ac in animation_coroutines.copy():
-            try:
-                ac.send(None)
-            except StopIteration:
-                animation_coroutines.remove(ac)
 
         garbage_coroutine.send(None)
         update_state_coroutine.send(None)
