@@ -3,6 +3,10 @@ import aiofiles
 from datetime import datetime
 import argparse
 import os
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
 
 async def listen_chat(host: str, port: int, history_path: str):
     reader, writer = await asyncio.open_connection(
@@ -11,11 +15,10 @@ async def listen_chat(host: str, port: int, history_path: str):
     while data := await reader.read(1000):
         now = datetime.now().strftime("%d.%m.%Y %H:%M")
         msg = f'[{now}] {data.decode()}'
-        print(msg)
         async with aiofiles.open(history_path, mode='a', encoding='utf-8') as myfile:
             await myfile.write(msg)
 
-    print('Close the connection')
+    logging.info('Close the connection')
     writer.close()
 
 
